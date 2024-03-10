@@ -49,23 +49,30 @@ const puppeteer = require('puppeteer');
     // Navigate to the initial page
 
 
+    const news = {
+      header: null,
+      image:null,
+      content:null,
+    }
+
     const items = [];
 
-    for (let title = 2; title <= 10; title++) {
+    for (let title = 2; title <= 30; title++) {
 
       try {
         await page.waitForSelector('.recent-item');
         const pageviews = await page.$$('.recent-item');
         for (const pageview of pageviews) {
           try {
-
-            const eachFullnews = await pageview.$eval('.post-thumbnail a', (el) => el.getAttribute('href'));
-            items.push({ eachFullnews });
-            console.log(items);
-
+           
+             news.header = await pageview.$eval('.post-thumbnail a', (el) => el.getAttribute('href'));
+            news.image = await pageview.$eval('img', (el) => el.getAttribute('src'));
+          const title = await pageview.$eval('h3 a', (el) => el.textContent );
+            // console.log(items);
+           
             // Separate each URL and process it individually
-            for (const fullnews of eachFullnews.split(',')) {
-              console.log(fullnews.trim()); // Trim any extra spaces
+            for (const fullnews of news.header.split(',')) {
+              // console.log(fullnews.trim()); // Trim any extra spaces
               try {
                 const newsPage = await browser.newPage();
 
@@ -89,9 +96,29 @@ const puppeteer = require('puppeteer');
 
 
                 await newsPage.goto(`${fullnews.trim()}`, { waitUntil: 'networkidle2' });
-                // Your scraping logic here (replace this comment)
-                // ...
-                // Close the new tab (if needed)
+                
+             
+                // for scrape each full news
+
+
+                const scrapedData = await newsPage.evaluate(() => {
+                  const div = document.querySelector('.entry');  // Replace with your specific div selector
+                  const validTags = ['P', 'LI', 'TABLE', 'OL', 'UL', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6'];
+      
+                  const filteredElements = Array.from(div.getElementsByTagName('*'))
+                      .filter(tag => validTags.includes(tag.tagName));
+                  return filteredElements.map(tag => {
+                      return tag.outerHTML;  // Return the entire HTML tag as a string
+                  });
+              });
+      
+              // Print the extracted content (HTML tags)
+              // for (const tag of scrapedData) {
+              //     console.log(tag);
+              // }
+
+              console.log( `${title}\n ${news.header}\n ${ news.image}\n  ${scrapedData} \n\n\n\n`)
+
                 await newsPage.close();
               } catch (error) {
                 console.error('Errorr navigating to:', fullnews, error);
