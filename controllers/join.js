@@ -1,5 +1,5 @@
 const puppeteer = require('puppeteer');
-const save = require('./stores')
+
 
 
 (async () => {
@@ -65,13 +65,13 @@ const save = require('./stores')
         for (const pageview of pageviews) {
           try {
            
-        const  links = await pageview.$eval('.post-thumbnail a', (el) => el.getAttribute('href'));
-          const   image = await pageview.$eval('img', (el) => el.getAttribute('src'));
+             news.header = await pageview.$eval('.post-thumbnail a', (el) => el.getAttribute('href'));
+            news.image = await pageview.$eval('img', (el) => el.getAttribute('src'));
           const title = await pageview.$eval('h3 a', (el) => el.textContent );
             // console.log(items);
            
             // Separate each URL and process it individually
-            for (const fullnews of links.split(',')) {
+            for (const fullnews of news.header.split(',')) {
               // console.log(fullnews.trim()); // Trim any extra spaces
               try {
                 const newsPage = await browser.newPage();
@@ -96,8 +96,8 @@ const save = require('./stores')
 
 
                 await newsPage.goto(`${fullnews.trim()}`, { waitUntil: 'networkidle2' });
-               const savess =  save(image)
-             console.log(savess);
+                
+             
                 // for scrape each full news
 
 
@@ -113,11 +113,11 @@ const save = require('./stores')
               });
       
               // Print the extracted content (HTML tags)
-              // for (const tag of scrapedData) {ss
+              // for (const tag of scrapedData) {
               //     console.log(tag);
               // }
 
-              console.log( `${title}\n ${links}\n ${ image}\n  ${scrapedData} \n\n\n\n`)
+              console.log( `${title}\n ${news.header}\n ${ news.image}\n  ${scrapedData} \n\n\n\n`)
 
                 await newsPage.close();
               } catch (error) {

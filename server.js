@@ -1,142 +1,96 @@
-// const puppeteer = require('puppeteer');
+require("dotenv").config();
+const express = require("express");
+const app = express();
+const punycode = require('punycode/')
+const PORT = process.env.PORT || 3500;
+const path = require("path");
+const { logger } = require("./middleware/logEvent");
+const cors = require("cors");
+const errorHandle = require("./middleware/erroHandle");
+// const corsOptions = require("./config/corsOptions");
+const verifyJWT = require("./middleware/verifyJWT");
+const cookieParser = require("cookie-parser");
+const mongoose = require("mongoose");
+const connectDB = require("./config/db");
+const credentials = require("./middleware/credentials");
 
-// (async () => {
-//   const browser = await puppeteer.launch({
-//     headless: false,
-//     defaultViewport: false,
-//     userDataDir: "/tmp"
-//   });
 
-//   const page = await browser.newPage();
-//   await page.goto('https://www.amazon.co.uk/s?k=airpods+case&adgrpid=1187474265862542&hvadid=74217342315357&hvbmt=bb&hvdev=c&hvlocphy=152653&hvnetw=o&hvqmt=b&hvtargid=kwd-74217389742076&hydadcr=24894_2220811&qid=1707929931&ref=sr_pg_3',{
-//     waitUntil:'load'
-//   });
-//   await page.waitForSelector(' .s-result-item '); // wait for the elements to be loaded
-//   const pageview = await page.$$(' .s-result-item .sg-col-inner ');
-//   let items = []
-//   let image = null
-//   let title = null
-//   const itIsDesable = false
-//   while(!itIsDesable){
-//     for (const pageviews of pageview) {
-//       // use try...catch to handle errors
-//       try {
-  
-//         // use pageviews.$eval to pass the element handle
-//        image = await pageviews.$eval('.s-image ', el => el.getAttribute('src'));
-//        title = await pageviews.$eval('span', el => el.textContent);
-//         if (items !== null) {
-//            items.push({ image, title });
-//         }
-       
-//         // const isdisable = await page.$$(' .s-pagination-item  .s-pagination-disabled ') !== null ;
-//         // console.log(isdisable);
-//         // itIsDesable = isdisable
-//         // use items.push to add the data to the array
- 
-       
-//       } catch (error) {
-//          console.log(error);
-//       }
-//       await page.waitForSelector('.s-pagination-button ', {visible : true})
-//       await page.click(' .s-pagination-button ')
-//     }
-//    }
-//   // for (const pageviews of pageview) {
-//   //   // use try...catch to handle errors
-//   //   try {
+//connect to mongoose
+connectDB();
 
-//   //     // use pageviews.$eval to pass the element handle
-//   //    image = await pageviews.$eval('.s-image ', el => el.getAttribute('src'));
-//   //    title = await pageviews.$eval('span', el => el.textContent);
-    
-//   //     // use items.push to add the data to the array
-//   //     items.push({ image, title });
-//   //   } catch (error) {
-//   //     // console.log(error);
-//   //   }
-//   // }
-//   console.log(items); // print the items array
-//   console.log(items.length);
-// })();
+app.use(logger);
+
+// Handle options credentials check - before CORS!
+// and fetch cookies credentials requirement
+//  app.use(credentials);
+
+//Cross Origin Resource sharing
+
+const corsOptions = {
+
+  origin: ['http://localhost:5173','https://www.abaniseedu.com', 'http://localhost:3000'],
+  credentials: true,
+  // optionsSuccessStatus:40
+
+};
+app.use(cors(corsOptions));
+
+
+//Build-in middleware to handle urlencoded form data
+app.use(express.urlencoded({ extended: false }));
+
+//buld-in middleware for json
+app.use(express.json());
+
+//middleware for cookies
+app.use(cookieParser());
+
+// serve static  public
+app.use("/", express.static(path.join(__dirname, "/public")));
+
+//routes
+
+
+app.use("/upload", require("./route/image"));
 
 
 
+const os = require("os");
+const networkInterfaces = os.networkInterfaces();
+let addresses = [];
 
-// const loginToFiverr = async () => {
-//     const browser = await puppeteer.launch();
-//     const page = await browser.newPage();
-
-//     // Set user agent to mimic a browser from the USA
-//     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3');
-
-//     // Navigate to Fiverr login page
-//     await page.goto('https://www.fiverr.com/login', { waitUntil: 'load' });
-
-//     // Fill in your username and password
-//     // await page.type('#username', 'your_username');
-//     // await page.type('#password', 'your_password');
-
-//     // Click the login button
-//     // await page.click('#login');
-
-//     // Wait for 1 minute (adjust as needed)
-//     await page.waitForTimeout(60000);
-
-//     // Refresh the page
-//     // await page.reload({ waitUntil: 'load' });
-
-//     // Take a screenshot (optional)
-//     await page.screenshot({ path: 'fiverr_page.png' });
-
-//     // Close the browser
-//     await browser.close();
-// };
-
-// loginToFiverr();
-
-const puppeteer = require('puppeteer');
-
-async function keepFiverrOnline() {
-  const browser = await puppeteer.launch({
-        headless: false,
-       defaultViewport: false,
-       userDataDir: "/tmp"
-      }); // Set headless to true for production
-  const page = await browser.newPage();
-  // Set the browser location to a USA IP address (45.87.214.71)
-  // await page.setGeolocation({ latitude: 45.87, longitude: 214.71 });
-
-  // Navigate to Fiverr login page
-  await page.goto('https://www.fiverr.com/login');
-
-  await page.waitForSelector('.ipXM0u3 .BEWtDu1 .cNh938Y .icon-button .EVCR5Os ', {visible : true})
-      await page.click(' .ipXM0u3 BEWtDu1 cNh938Y icon-button EVCR5Os ')
-    
-  // Fill in your email and password
-  // await page.type('#email-input', 'your_email');
-  // await page.type('#password-input', 'your_password');
-  // await page.click('#login-button');
-  
-  // Set the browser location to a USA IP address (45.87.214.71)
-  // await page.setGeolocation({ latitude: 45.87, longitude: 214.71 });
-
-  // Periodically reload the page (e.g., every 2 minutes)
-  setInterval(async () => {
-    await page.reload();
-    console.log('Page reloaded.');
-  }, 2 * 60 * 1000); // 2 minutes
-
-  // Keep the script running indefinitely
-  // (You can deploy this on Vercel or any other server)
-
-  // Close the browser when done
-  // await browser.close();
+for (const k in networkInterfaces) {
+  for (const k2 in networkInterfaces[k]) {
+    const address = networkInterfaces[k][k2];
+    if (address.family === "IPv4" && !address.internal) {
+      addresses.push(address.address);
+    }
+  }
 }
 
-keepFiverrOnline();
+console.log(addresses);
 
 
 
 
+// app.use(verifyJWT);
 
+
+app.get(
+  "/red(.html)?",
+  (req, res, next) => {
+    console.log("Allah help me");
+    next();
+  },
+  (req, res) => {
+    res.send("it is okay");
+  }
+);
+//handle error
+app.use(errorHandle);
+
+mongoose.connection.once("open", () => {
+  console.log("connected to mangoosedb");
+
+  app.listen(PORT, () => console.log(`serves run on Port ${PORT}`));
+});
