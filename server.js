@@ -53,11 +53,11 @@ app.use("/", express.static(path.join(__dirname, "/public")));
 
 app.use("/scrape", require("./route/scrape"));
 app.use("/admissionNews", require("./route/admission"));
-app.use("/jamb", require("./route/jamb"));
-app.use("/olevel", require("./route/olevel"));
+app.use("/jambNews", require("./route/jamb"));
+app.use("/olevelNews", require("./route/olevel"));
 app.use("/news", require("./route/news"));
 app.use("/postutme", require("./route/postutme"));
-app.use("/scorlarship", require("./route/scorlarship"));
+app.use("/scholarshipNews", require("./route/scorlarship"));
 const os = require("os");
 const networkInterfaces = os.networkInterfaces();
 let addresses = [];
