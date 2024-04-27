@@ -1,8 +1,13 @@
+
+
+
+
 const puppeteer = require('puppeteer');
+const axios = require('axios');
+const News = require('../model/Fullnews'); 
+const   saveImageToS3 = require('./s3')
 
-
-
-(async () => {
+const scrapenews = async (req, res)=>{
   try {
 
 
@@ -41,37 +46,33 @@ const puppeteer = require('puppeteer');
 
 
 
-    const baseUrl = 'https://schoolnewsng.com/';
-    await page.goto(baseUrl, { waitUntil: 'load' });
-    await page.waitForSelector('.recent-item');
+   
 
 
     // Navigate to the initial page
 
 
-    const news = {
-      header: null,
-      image:null,
-      content:null,
-    }
-
     const items = [];
 
-    for (let title = 2; title <= 30; title++) {
+    for (let title = 1; title <= 30; title++) {
 
+      const baseUrl =`https://schoolnewsng.com/page/${title}/`;
+      await page.goto(baseUrl, { waitUntil: 'load' });
+      await page.waitForSelector('.recent-item');
       try {
         await page.waitForSelector('.recent-item');
         const pageviews = await page.$$('.recent-item');
         for (const pageview of pageviews) {
           try {
            
-             news.header = await pageview.$eval('.post-thumbnail a', (el) => el.getAttribute('href'));
-            news.image = await pageview.$eval('img', (el) => el.getAttribute('src'));
+           const  header = await pageview.$eval('.post-thumbnail a', (el) => el.getAttribute('href'));
+           const imageUrl = await pageview.$eval('img', (el) => el.getAttribute('src'));
           const title = await pageview.$eval('h3 a', (el) => el.textContent );
             // console.log(items);
+           const route = header.split('/')
            
             // Separate each URL and process it individually
-            for (const fullnews of news.header.split(',')) {
+            for (const fullnews of header.split(',')) {
               // console.log(fullnews.trim()); // Trim any extra spaces
               try {
                 const newsPage = await browser.newPage();
@@ -111,15 +112,16 @@ const puppeteer = require('puppeteer');
                       return tag.outerHTML;  // Return the entire HTML tag as a string
                   });
               });
-      
-              // Print the extracted content (HTML tags)
-              // for (const tag of scrapedData) {
-              //     console.log(tag);
-              // }
-
-              console.log( `${title}\n ${news.header}\n ${ news.image}\n  ${scrapedData} \n\n\n\n`)
-
-                await newsPage.close();
+              console.log(scrapedData, title, imageUrl, 'gggg', route[3]);
+             
+          //  const imag =   await saveImageToS3(imageUrl)
+          //     const contentString = scrapedData.join('\n'); const news = new News({
+          //       title:title,
+          //       image: imag,
+          //       content:contentString
+          //     })
+          await newsPage.close();
+              // news.save()
               } catch (error) {
                 console.error('Errorr navigating to:', fullnews, error);
                 break;
@@ -132,7 +134,7 @@ const puppeteer = require('puppeteer');
           }
         }
         console.log(title);
-        await page.click(`a.page[title="${title}"]`);
+        // await page.click(`a.page[title="${title}"]`);
         await page.waitForSelector('.recent-item');
 
       } catch (error) {
@@ -148,4 +150,6 @@ const puppeteer = require('puppeteer');
   } catch (error) {
     console.error('An error occurred:', error);
   }
-})();
+};
+
+module.exports = scrapenews

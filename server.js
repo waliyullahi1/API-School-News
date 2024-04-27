@@ -51,7 +51,7 @@ app.use("/", express.static(path.join(__dirname, "/public")));
 //routes
 
 
-app.use("/upload", require("./route/image"));
+app.use("/scrape", require("./route/scrape"));
 
 
 
