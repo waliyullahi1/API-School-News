@@ -9,16 +9,13 @@ AWS.config.update({
   });
 
   const s3 = new AWS.S3();
-const admissionSp = async (req, res)=> {
-    scrapenews ('admissionnewsimage', 'admission', 'admisssion')
-}
 
 
 
 const newsDB = async  (req, res)=> {
     
    
-        const title = /JAMB/; // This is a regular expression that matches any string containing 'admission'
+        const title = [/Scholarship/,/scholarship/] // This is a regular expression that matches any string containing 'admission'
         const news = await News.find({title: title});
         res.json(news);
   
@@ -43,4 +40,4 @@ const newsImage = async (req, res)=> {
 }
 
 
-module.exports = {admissionSp, newsDB, newsImage}
+module.exports = { newsDB, newsImage}

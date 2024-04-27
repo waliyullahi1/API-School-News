@@ -19,7 +19,7 @@ const models = {
   'Postutme': Postutme,
   'Jambnews': Jambnews,
 };
-const scrapenews = async (bucketname, typeNews, typeofNews)=>{
+const scrapenews = async (bucketname, typeNews, store)=>{
   try {
 
 
@@ -126,19 +126,20 @@ const scrapenews = async (bucketname, typeNews, typeofNews)=>{
                   });
               });
               console.log(scrapedData, title, imageUrl, 'gggg', route[3]);
-              const Model = models[typeofNews];
+              const Model = models[store];
 
               if (!Model) {
                 throw new Error(`No model found for ${typeofNews}`);
               }
 
 
-           const imag =   await saveImageToS3(imageUrl)
+         
               const contentString = scrapedData.join('\n');
            const news = new Model({
                title:title,
                 image: imag,
-                content:contentString
+                content:contentString,
+                route:route[3]
                })
           await newsPage.close();
               // news.save()

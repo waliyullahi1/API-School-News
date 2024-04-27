@@ -1,11 +1,26 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const ImageSchema = new mongoose.Schema({
-  name: String,
-  img: { data: Buffer, contentType: String }
+const News = new Schema({
+  title: {
+    type: String,
+    required: true
+    },
+    image:{
+      type: String,
+      required: true
+      },
+  content:{
+    type: String,
+    required: true
+  },
+  route: {
+    type: String,
+    required: true
+  },
+
+
+
 });
 
-// Create a model from the schema
-
-module.exports = mongoose.model('Image', ImageSchema);
+module.exports = mongoose.model('News', News );
