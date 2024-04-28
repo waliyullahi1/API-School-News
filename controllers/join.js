@@ -68,30 +68,30 @@ const scrapenews = async (req, res)=>{
            const  header = await pageview.$eval('.post-thumbnail a', (el) => el.getAttribute('href'));
            const imageUrl = await pageview.$eval('img', (el) => el.getAttribute('src'));
           const title = await pageview.$eval('h3 a', (el) => el.textContent );
-            // console.log(items);
+          
            const route = header.split('/')
-           
-            // Separate each URL and process it individually
+        const image =  await  saveImageToS3(imageUrl)
+            console.log(route[3], 'fffffff');
             for (const fullnews of header.split(',')) {
-              // console.log(fullnews.trim()); // Trim any extra spaces
+           
               try {
                 const newsPage = await browser.newPage();
 
                 await newsPage.setRequestInterception(true);
-                // Define patterns for ad-related requests
+              
                 const adPatterns = [
-                  'adsystem.com', // Add other ad domains as needed
+                  'adsystem.com', 
                   'doubleclick.net',
                   'amazon-adsystem.com',
-                  // ... (more ad domains)
+               
                 ];
 
                 newsPage.on('request', (request) => {
                   const url = request.url();
                   if (adPatterns.some((pattern) => url.includes(pattern))) {
-                    request.abort(); // Block the request
+                    request.abort(); 
                   } else {
-                    request.continue(); // Allow other requests
+                    request.continue(); 
                   }
                 });
 
@@ -99,29 +99,32 @@ const scrapenews = async (req, res)=>{
                 await newsPage.goto(`${fullnews.trim()}`, { waitUntil: 'networkidle2' });
                 
              
-                // for scrape each full news
+               
 
 
                 const scrapedData = await newsPage.evaluate(() => {
-                  const div = document.querySelector('.entry');  // Replace with your specific div selector
+                  const div = document.querySelector('.entry');  
                   const validTags = ['P', 'LI', 'TABLE', 'OL', 'UL', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6'];
       
                   const filteredElements = Array.from(div.getElementsByTagName('*'))
                       .filter(tag => validTags.includes(tag.tagName));
                   return filteredElements.map(tag => {
-                      return tag.outerHTML;  // Return the entire HTML tag as a string
+                      return tag.outerHTML;  
                   });
               });
-              console.log(scrapedData, title, imageUrl, 'gggg', route[3]);
+               console.log(scrapedData, title, imageUrl, 'gggg', route[3],`\n\n\n`);
              
-          //  const imag =   await saveImageToS3(imageUrl)
-          //     const contentString = scrapedData.join('\n'); const news = new News({
-          //       title:title,
-          //       image: imag,
-          //       content:contentString
-          //     })
+      
+              const contentString = scrapedData.join('\n');
+           const news = new News({
+                title:title,
+                image: image,
+                content:contentString,
+                route:route[3]
+              })
+               news.save()
           await newsPage.close();
-              // news.save()
+             
               } catch (error) {
                 console.error('Errorr navigating to:', fullnews, error);
                 break;
@@ -139,13 +142,13 @@ const scrapenews = async (req, res)=>{
 
       } catch (error) {
         console.error('Error navigating to page', title, ':', error);
-        break; // Stop if there's an error (e.g., no more pages)
+        break; 
       }
     }
 
     console.log('Total items on page 1:', items.length);
 
-    // Close the browser when done
+    
 
   } catch (error) {
     console.error('An error occurred:', error);
