@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.1608.0",
     "axios": "^1.6.7",
     "bcryptjs": "^2.4.3",
     "clipboardy": "^4.0.0",
