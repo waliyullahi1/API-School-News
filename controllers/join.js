@@ -54,7 +54,7 @@ const scrapenews = async (req, res)=>{
 
     const items = [];
 
-    for (let title = 1; title <= 30; title++) {
+    for (let title = 1; title <= 200; title++) {
 
       const baseUrl =`https://schoolnewsng.com/page/${title}/`;
       await page.goto(baseUrl, { waitUntil: 'load' });
@@ -123,6 +123,7 @@ const scrapenews = async (req, res)=>{
                 route:route[3]
               })
                news.save()
+               console.log(news)
           await newsPage.close();
              
               } catch (error) {
