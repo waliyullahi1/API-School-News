@@ -58,19 +58,10 @@ const os = require("os");
 const networkInterfaces = os.networkInterfaces();
 let addresses = [];
 
-for (const k in networkInterfaces) {
-  for (const k2 in networkInterfaces[k]) {
-    const address = networkInterfaces[k][k2];
-    if (address.family === "IPv4" && !address.internal) {
-      addresses.push(address.address);
-    }
-  }
-}
 
-console.log(addresses);
 
 app.use("/news", require("./route/news"));
-
+app.use("/newsletter", require("./route/newsletter"));
 
 
 
