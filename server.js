@@ -13,7 +13,7 @@ const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
 const connectDB = require("./config/db");
 const credentials = require("./middleware/credentials");
-
+const {startNewsScraperJob} = require("./controllers/newsScraper.job");
 
 //connect to mongoose
 connectDB();
@@ -81,6 +81,8 @@ app.get(
     res.send("it is okay");
   }
 );
+
+startNewsScraperJob()
 //handle error
 app.use(errorHandle);
 

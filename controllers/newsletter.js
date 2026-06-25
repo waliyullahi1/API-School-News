@@ -25,14 +25,19 @@ const subscribeNewsletter = async (req, res) => {
 
     // check existing
     const existingSubscriber = await NewsletterSubscriber.findOne({ email })
-
-    return res.status(201).json({
+    
+    
+    if(existingSubscriber) {
+        return res.status(201).json({
       success: true,
       message: 'You have subscribed successfully',
      
     })
+    }
 
     const subscriber = await NewsletterSubscriber.create({ email })
+    
+    
  const emailRes = await bravo_sendEmail({
         to: email,
         subject: "Thanks for subscribing to Abanise News",
