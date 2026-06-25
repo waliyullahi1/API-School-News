@@ -30,7 +30,7 @@ app.use(logger);
 
 const corsOptions = {
 
-  origin: ['https://news.abaniseedu.com','https://www.abaniseedu.com', 'http://localhost:3000'],
+  origin: ['https://news.abaniseedu.com','https://www.abaniseedu.com',  'https://www.news.abanise.com','http://localhost:3000'],
   credentials: true,
   // optionsSuccessStatus:40
 
