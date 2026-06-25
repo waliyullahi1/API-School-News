@@ -19,51 +19,64 @@ const getAllNewss = async (req, res) => {
   }
 };
 
-
-
+const escapeRegex = (text = "") => {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+};
 
 const getAllNews = async (req, res) => {
   try {
-    const page = Math.max(1, parseInt(req.query.page) || 1);
-    const limit = Math.max(1, parseInt(req.query.limit) || 20);
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const limit = Math.max(1, parseInt(req.query.limit, 10) || 20);
     const skip = (page - 1) * limit;
 
     const filter = {};
 
-    // ================= CATEGORY FILTER =================
-if (req.query.category) {
-  if(req.query.category === 'olevel'){
-    req.query.category = "o'level";
-  }
-  filter.category = {
-    $regex: `^${req.query.category.trim()}$`,
-    $options: 'i'
-  };
-}
-    console.log( req.query.category, ' req.query.category');
+    /* ================= CATEGORY FILTER ================= */
+    if (req.query.category?.trim()) {
+      let category = req.query.category.trim().toLowerCase();
 
-console.log( filter.category, ' filter.category');
+      // frontend olevel => db o'level
+      if (category === "olevel") {
+        category = "o'level";
+      }
 
-    // ================= TITLE SEARCH FILTER =================
-    if (req.query.title) {
-      filter.title = {
-        $regex: req.query.title.trim(),
-        $options: 'i' // case-insensitive
+      // because category is ARRAY of STRINGS
+      filter.category = {
+        $elemMatch: {
+          $regex: `^${escapeRegex(category)}$`,
+          $options: "i"
+        }
       };
     }
-    
+
+    /* ================= SEARCH FILTER =================
+       Search in title + excerpt + content
+    ================================================ */
+    if (req.query.search?.trim()) {
+      filter.$text = {
+        $search: req.query.search.trim()
+      };
+    }
+
+  
+
+    let query = News.find(filter)
+      .select("title slug image excerpt datePublished category createdAt");
+
+    // if searching, sort by relevance score first
+    if (req.query.search?.trim()) {
+      query = query
+        .select({ score: { $meta: "textScore" } })
+        .sort({ score: { $meta: "textScore" }, datePublished: -1, _id: -1 });
+    } else {
+      query = query.sort({ datePublished: -1, _id: -1 });
+    }
+
     const [total, news] = await Promise.all([
       News.countDocuments(filter),
-      News.find(filter)
-        .select('title slug image excerpt datePublished category createdAt')
-       
-         .sort({ datePublished: -1, _id: -1 })
-        .skip(skip)
-        .limit(limit)
-        .lean()
+      query.skip(skip).limit(limit).lean()
     ]);
-   
-    
+  
     return res.status(200).json({
       success: true,
       data: news,
@@ -77,12 +90,15 @@ console.log( filter.category, ' filter.category');
       }
     });
   } catch (error) {
+    console.error("GET ALL NEWS ERROR:", error);
     return res.status(500).json({
       success: false,
-      message: error.message
+      message: error.message || "Failed to fetch news"
     });
   }
 };
+
+
 
 
 

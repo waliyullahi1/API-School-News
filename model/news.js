@@ -25,6 +25,7 @@ const NewsSchema = new Schema(
       index: true
     },
 
+    // since category is array of strings
     category: {
       type: [String],
       default: [],
@@ -70,10 +71,16 @@ const NewsSchema = new Schema(
   { timestamps: true }
 );
 
-// helpful compound indexes
+// helpful indexes
 NewsSchema.index({ createdAt: -1 });
 NewsSchema.index({ datePublished: -1 });
 NewsSchema.index({ category: 1, datePublished: -1 });
-NewsSchema.index({ title: "text", excerpt: "text" });
+
+// FULL TEXT SEARCH INDEX
+NewsSchema.index({
+  title: "text",
+  excerpt: "text",
+  content: "text"
+});
 
 module.exports = mongoose.model("News", NewsSchema);
