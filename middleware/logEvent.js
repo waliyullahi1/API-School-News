@@ -15,10 +15,10 @@ const logEvent = async (message, logName) => {
 //'/tmp'
 const logger = (req, res, next) => {
   console.log(`${req.method} ${req.path}`);
-  logEvent(
-    `${req.method}\t ${req.headers.origin}\t ${req.url}`,
-    "newfile.txt"
-  );
+  // logEvent(
+  //   `${req.method}\t ${req.headers.origin}\t ${req.url}`,
+  //   "newfile.txt"
+  // );
   next();
 };
 

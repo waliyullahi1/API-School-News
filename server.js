@@ -20,6 +20,8 @@ connectDB();
 
 app.use(logger);
 
+
+
 // Handle options credentials check - before CORS!
 // and fetch cookies credentials requirement
 //  app.use(credentials);
@@ -51,13 +53,7 @@ app.use("/", express.static(path.join(__dirname, "/public")));
 //routes
 
 
-app.use("/scrape", require("./route/scrape"));
-app.use("/admissionNews", require("./route/admission"));
-app.use("/jambNews", require("./route/jamb"));
-app.use("/olevelNews", require("./route/olevel"));
-app.use("/news", require("./route/news"));
-app.use("/postutme", require("./route/postutme"));
-app.use("/scholarshipNews", require("./route/scorlarship"));
+
 const os = require("os");
 const networkInterfaces = os.networkInterfaces();
 let addresses = [];
@@ -72,6 +68,11 @@ for (const k in networkInterfaces) {
 }
 
 console.log(addresses);
+
+app.use("/news", require("./route/news"));
+
+
+
 
 
 

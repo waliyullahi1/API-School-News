@@ -1,26 +1,79 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const News = new Schema({
-  title: {
-    type: String,
-    required: true
+const NewsSchema = new Schema(
+  {
+    wordpressId: {
+      type: Number,
+      unique: true,
+      sparse: true,
+      index: true
     },
-    image:{
+
+    title: {
+      type: String,
+      required: true,
+      trim: true
+    },
+
+    slug: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+      index: true
+    },
+
+    category: {
+      type: [String],
+      default: [],
+      index: true
+    },
+
+    image: {
+      type: String,
+      default: ""
+    },
+
+    imagePublicId: {
+      type: String,
+      default: ""
+    },
+
+    sourceImageUrl: {
+      type: String,
+      default: "",
+      index: true
+    },
+
+    sourceUrl: {
+      type: String,
+      default: ""
+    },
+
+    content: {
       type: String,
       required: true
-      },
-  content:{
-    type: String,
-    required: true
+    },
+
+    excerpt: {
+      type: String,
+      required: true
+    },
+
+    datePublished: {
+      type: Date,
+      index: true
+    }
   },
-  route: {
-    type: String,
-    required: true
-  },
+  { timestamps: true }
+);
 
+// helpful compound indexes
+NewsSchema.index({ createdAt: -1 });
+NewsSchema.index({ datePublished: -1 });
+NewsSchema.index({ category: 1, datePublished: -1 });
+NewsSchema.index({ title: "text", excerpt: "text" });
 
-
-});
-
-module.exports = mongoose.model('news', News );
+module.exports = mongoose.model("News", NewsSchema);
