@@ -125,7 +125,7 @@ ${category}
 </span>
 
 <h1 style="
-margin:24px 0 18px;
+margin:16px 0 14px;
 font-size:30px;
 line-height:1.15;
 font-weight:800;
@@ -142,7 +142,7 @@ Hello <strong>${name}</strong>,
 </p>
 
 <p style="
-margin:18px 0;
+margin:13px 0;
 font-size:16px;
 line-height:1.9;
 color:#4b5563;">
@@ -168,7 +168,7 @@ href="${articleUrl}"
 target="_blank"
 style="
 display:inline-block;
-padding:16px 34px;
+padding:11px 25px;
 font-size:16px;
 font-weight:bold;
 color:#ffffff;
@@ -183,13 +183,13 @@ Read Full Story →
 </tr>
 
 <tr>
-<td style="padding:0 36px;">
+<td style="padding:0 25px;">
 <hr style="border:none;border-top:1px solid #e5e7eb;">
 </td>
 </tr>
 
 <tr>
-<td style="padding:30px 36px;background:#fafafa;">
+<td style="padding:30px 20px;background:#fafafa;">
 
 <h3 style="
 margin:0 0 14px;

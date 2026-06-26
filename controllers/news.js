@@ -98,6 +98,31 @@ const getAllNews = async (req, res) => {
   }
 };
 
+const getSitemapNews = async (req, res) => {
+  try {
+    
+    
+    const news = await News.find({})
+      .select("slug updatedAt datePublished")
+      .sort({ datePublished: -1 })
+      .lean();
+    
+    
+    return res.status(200).json({
+      success: true,
+      data: news
+    });
+
+  } catch (error) {
+    console.error("SITEMAP ERROR:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
 
 
 
@@ -136,4 +161,4 @@ const getNewsBySlug = async (req, res) => {
 
 
 
-module.exports = {getAllNews, getNewsBySlug}
+module.exports = {getAllNews,getSitemapNews, getNewsBySlug}
