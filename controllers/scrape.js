@@ -505,8 +505,13 @@ const scrapenews = async () => {
         response = await axios.get(url, {
           timeout: 30000,
           headers: {
-            "User-Agent": "Mozilla/5.0"
-          }
+              "User-Agent":
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
+              "Accept": "application/json,text/html,application/xhtml+xml",
+              "Accept-Language": "en-US,en;q=0.9",
+              "Referer": "https://schoolnewsng.com/",
+              "Origin": "https://schoolnewsng.com"
+            }
         });
       } catch (error) {
         if (error.response && error.response.status === 400) {
@@ -596,7 +601,9 @@ const scrapenews = async () => {
     };
   } catch (error) {
     console.error("❌ Scrape failed:", error.message);
-
+    console.log(error.response?.status);
+    console.log(error.response?.headers);
+    console.log(error.response?.data);
     return {
       success: false,
       message: error.message
