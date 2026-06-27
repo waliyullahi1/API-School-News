@@ -240,7 +240,11 @@ async function saveSinglePost(post) {
       if (wordpressId) existingNews.wordpressId = wordpressId;
 
       await existingNews.save();
-
+          try {
+      await sendNewsToSubscribers(news);
+    } catch (emailError) {
+      console.error(`❌ News saved but email sending failed for ${slug}:`, emailError.message);
+    }
       console.log(`✏ Updated: ${slug}`);
       return {
         status: "updated",
@@ -483,6 +487,16 @@ const oddscrapenews = async () => {
 
 const scrapenews = async () => {
   try {
+
+//     const start = new Date();
+// const latest = await News.findOne().sort({ updatedAt: -1 });
+//     console.log(latest);
+    
+// if (latest) {
+//   await News.deleteOne({ _id: latest._id });
+//   console.log("Deleted:", latest.title);
+// }
+
     let page = 1;
     let keepGoing = true;
 
